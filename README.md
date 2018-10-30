@@ -5,7 +5,7 @@
 
       实例：rjs目录与build目录同级 + gulpfile.js的配置;
       
-           执行命令：gulp prodstep
+           执行命令：gulp prod
      
 方式二：r.js
 
