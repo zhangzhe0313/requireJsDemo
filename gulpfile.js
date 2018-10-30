@@ -23,20 +23,19 @@ var livereload = require('gulp-livereload'), // 网页自动刷新（文件变�
 	rev = require('gulp-rev'), // 缓存控制
 	spritesmith = require('gulp.spritesmith'),
 	revCollector = require('gulp-rev-collector'), // 缓存控制
-	// requirejsOptimize = require('gulp-requirejs-optimize');
 	requirejsOptimize = require('requirejs');
 
 var path = require('path'),
 	desDir = require('./localconfig.json').templateaddress; // 读取模板的路径，因为每个人的路径都不一致，所以放到localconfig文件中并且添加到gitignore中
+
 /**************************开发配置*****************************/
 // clean build folder.
 gulp.task('cleanbuild', function (cb) {
-	console.log('------****** 开始准备删除 build目录 ******------');
 	var stream = gulp.src('./build/', {
 		read: false
 	}).pipe(clean());
 
-	console.log('------****** build目录删除成功！******------');
+	console.log('build目录删除成功！');
 	return stream;
 });
 
@@ -80,7 +79,7 @@ gulp.task('devcopycss', function () {
 	return stream;
 });
 
-// 源文件js拷贝处理,并处理自定义es6文件
+// 源文件js复制处理,并处理自定义es6文件
 gulp.task('devcopyjsfile', function () {
 	var stream = gulp.src(['./src/static/pc/js/**/*.js', '!./src/static/pc/js/3rdlibs/**/*.js', '!./src/static/pc/js/rjs/**'])
 		.pipe(babel())
@@ -105,7 +104,7 @@ gulp.task('devcopy3rdjsfile', function () {
 	console.log('源文件js拷贝完成');
 	return stream;
 });
-// 源文件fonts拷贝处理处理
+// 源文件fonts复制处理处理
 gulp.task('devcopyfonts', function () {
 	var stream = gulp.src('./src/static/pc/fonts/**/*')
 		.pipe(gulp.dest('./build/static/pc/fonts/'));
@@ -158,8 +157,7 @@ gulp.task('dev', function (callback) {
 });
 
 /**************************生产配置*****************************/
-
-// 删除dist下重新拷贝
+// 删除dist下重新复制
 gulp.task('cleandist', function (cb) {
 	var stream = gulp.src(path.resolve(desDir, './static/pc/'), {
 			read: false
@@ -181,7 +179,7 @@ gulp.task('prodcssmd5', function () {
 		.pipe(gulp.dest(path.resolve(desDir, './static/pc/css/')))
 	//		.pipe(gulp.dest('./build/static/pc/css/rev/'));
 
-	console.log('生产环境 css md5处理完毕');
+	console.log('生产环境css md5处理完毕');
 	return stream;
 });
 
@@ -190,7 +188,7 @@ gulp.task('prod3thjscopy', function () {
 	var stream = gulp.src(['./build/static/pc/**/*.min.js', './build/static/pc/**/+(fonts|img)/**/*'])
 		.pipe(gulp.dest(path.resolve(desDir, './static/pc/')));
 
-	console.log('第三方已压缩js、图片、字体等文件拷贝处理');
+	console.log('第三方已压缩js、图片、字体等文件复制处理');
 	return stream;
 });
 // js第三方未压缩插件压缩处理(*.min.js文件除外)
@@ -219,15 +217,14 @@ gulp.task('prodjscopy', function (cp) {
 	], cp);
 });
 
-// 生产环境 一键处理
+// 生产环境一键处理
 gulp.task('prod', function (callback) {
 	runSequence('prodjscopy', 'prod3thcomcopy', 'prod3thjscopy',
-		'prodcssmd5')
+		'prodcssmd5');
 });
 
 
-// -----------------------生产调整----------------------------
-
+// -----------------------生产流程调整----------------------------
 // 清空本地rjs/dist
 gulp.task('cleanrjsdist', function(cd) {
 	var stream = gulp.src('./rjs/dist/', {
@@ -236,7 +233,7 @@ gulp.task('cleanrjsdist', function(cd) {
 		force: true
 	}));
 
-	console.log('------****** 生产环境 rjs/dist目录成功删除！******------');
+	console.log('------****** 生产环境准备 rjs/dist目录成功删除！******------');
 	return stream;
 });
 // 删除本地原rjs配置文件
@@ -247,14 +244,14 @@ gulp.task('cleanmsbuildjs', function(cd) {
 		force: true
 	}));
 
-	console.log('------****** 生产环境 msbuild.json成功删除！******------');
+	console.log('------****** 生产环境准备 msbuild.json成功删除！******------');
 	return stream;
 });
 // 执行 node createBuild.js
 gulp.task('createbuildjs', function(){
 	require('./rjs/createBuild.js');
 
-	console.log('------****** 生产环境 msbuild.json 已成功动态创建 ******------');
+	console.log('------****** 生产环境准备 msbuild.json 已成功动态创建 ******------');
 });
 // 执行node r.js -o createBuild.js
 gulp.task('rjs', function(cd) {
@@ -275,14 +272,14 @@ gulp.task('rjs', function(cd) {
 		cd();
 	}, cd);
 
-	console.log('------****** 生产环境 js文件已合并 ******------');
+	console.log('------****** 生产环境准备 js文件已合并 ******------');
 });
 // 图片文件处理
 gulp.task('prodImgcopy', function () {
 	var stream = gulp.src('./build/static/pc/**/+(img)/**/*')
 		.pipe(gulp.dest(path.resolve(desDir, './static/pc/')));
 
-	console.log('------****** 生产环境 图片文件拷贝完成 ******------');
+	console.log('------****** 生产环境准备 图片文件拷贝完成 ******------');
 	return stream;
 });
 // 拷贝js文件
@@ -290,7 +287,7 @@ gulp.task('prodjs', function(cb) {
 	var stream = gulp.src(['./rjs/dist/pages/**/*', './rjs/ieBetter.js', './rjs/require.js', '!./rjs/dist/pages/**/dev.js'])
 		.pipe(gulp.dest(path.resolve(desDir, './static/pc/js/dist/')));
 
-	console.log('------****** 生产环境 rjs/dist/js文件拷贝完成 ******------');
+	console.log('------****** 生产环境准备 rjs/dist/js文件拷贝完成 ******------');
 	return stream;
 });
 // 删除指定目录
@@ -301,18 +298,18 @@ gulp.task('deletetargetdist', function(cd) {
 		force: true
 	}));
 
-	console.log('------****** 生产环境 目标dist目录成功删除！******------');
+	console.log('------****** 生产环境准备 目标dist目录成功删除！******------');
 	return stream;
 });
 /**
  * 1、清空本地build;
  * 2、清空本地rjs/dist;
- * 3、删除原msbuild.json文件;
- * 4、重新生成build;
- * 5、重新生成r.js配置文件;
- * 6、打包js文件;
- * 7、执行css prod;
- * 8、删除指定目录;
+ * 3、删除指定目录;
+ * 4、删除原msbuild.json文件;
+ * 5、重新生成build;
+ * 6、重新生成r.js配置文件;
+ * 7、打包js文件;
+ * 8、执行css img prod,拷贝文件到相应目录;
  * 9、拷贝dist中的js文件到指定目录
  */
 
@@ -320,17 +317,17 @@ gulp.task('deletetargetdist', function(cd) {
 gulp.task('cleanstep', function(cb) {
 	runSequence('cleanbuild', 'cleanrjsdist', 'cleanmsbuildjs', 'deletetargetdist',cb);
 });
-// dev
+// devstep 重新生成img,css文件
 gulp.task('devstep', function(cb) {
 	runSequence('devcopyhtml', 'imgtiny', 'devcopycss', 'devcopyjsfile', 'devcopyjsassignhtmlfile', 'devcopy3rdjsfile', 'scsstocss', cb);
 });
-// all prod
-gulp.task('newprod', function(callback) {
+// prodstep
+gulp.task('prodstep', function(callback) {
 	runSequence('cleanstep', ['devstep', 'createbuildjs'], 'rjs', ['prodImgcopy', 'prodcssmd5', 'prodjs'], 'webserver', function() {
 		console.log('------****** Finish prod. ******------');
 	});
 
-	console.log('------****** 生产环境 新版发布包已准备就绪 ******------');
+	console.log('------****** 生产环境准备 发布包已准备就绪 ******------');
 }).on('task_err', function(err) {
-	console.log('------****** 生产环境 新版发布包打包失败 ******------', err);
+	console.log('------****** 生产环境准备 发布包打包失败 ******------', err);
 });
