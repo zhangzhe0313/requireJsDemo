@@ -157,17 +157,6 @@ gulp.task('dev', function (callback) {
 });
 
 /**************************生产配置*****************************/
-// 删除dist下重新复制
-gulp.task('cleandist', function (cb) {
-	var stream = gulp.src(path.resolve(desDir, './static/pc/'), {
-			read: false
-		})
-		.pipe(clean({
-			force: true
-		}));
-	console.log('dist文件夹删除成功！');
-	return stream;
-})
 // css压缩md5处理
 gulp.task('prodcssmd5', function () {
 	var stream = gulp.src(['./build/static/pc/css/**/*.css'])
@@ -182,49 +171,6 @@ gulp.task('prodcssmd5', function () {
 	console.log('生产环境css md5处理完毕');
 	return stream;
 });
-
-// 第三方js，图片字体文件处理
-gulp.task('prod3thjscopy', function () {
-	var stream = gulp.src(['./build/static/pc/**/*.min.js', './build/static/pc/**/+(fonts|img)/**/*'])
-		.pipe(gulp.dest(path.resolve(desDir, './static/pc/')));
-
-	console.log('第三方已压缩js、图片、字体等文件复制处理');
-	return stream;
-});
-// js第三方未压缩插件压缩处理(*.min.js文件除外)
-gulp.task('prod3thcomcopy', function (cp) {
-	pump([
-		gulp.src(['./src/static/pc/js/3rdlibs/**/*.js', '!./src/static/pc/js/3rdlibs/**/*.min.js']),
-		gulp.dest('./build/static/pc/js/3rdlibs/'),
-		gulp.src(['./build/static/pc/js/3rdlibs/**/*.js', '!./build/static/pc/js/3rdlibs/**/*.min.js']),
-		uglify(),
-		gulp.dest(path.resolve(desDir, './static/pc/js/3rdlibs/'))
-	], cp);
-})
-// 拷贝压缩处理js, 不包括第三方及需要版本控制的js ***
-gulp.task('prodjscopy', function (cp) {
-	pump([
-		gulp.src(['./build/static/pc/**/*.js', '!./build/static/pc/js/3rdlibs/**/*.js']),
-		babel(),
-		uglify({
-			mangle: {
-				reserved: ['require', 'exports', 'module', '$']
-			},
-			// compress: true			
-			compress: false
-		}),
-		gulp.dest(path.resolve(desDir, './static/pc/'))
-	], cp);
-});
-
-// 生产环境一键处理
-gulp.task('prod', function (callback) {
-	runSequence('prodjscopy', 'prod3thcomcopy', 'prod3thjscopy',
-		'prodcssmd5');
-});
-
-
-// -----------------------生产流程调整----------------------------
 // 清空本地rjs/dist
 gulp.task('cleanrjsdist', function(cd) {
 	var stream = gulp.src('./rjs/dist/', {
@@ -302,8 +248,8 @@ gulp.task('deletetargetdist', function(cd) {
 	return stream;
 });
 /**
- * 1、清空本地build;
- * 2、清空本地rjs/dist;
+ * 1、删除本地build;
+ * 2、删除本地rjs/dist;
  * 3、删除指定目录;
  * 4、删除原msbuild.json文件;
  * 5、重新生成build;
@@ -322,7 +268,7 @@ gulp.task('devstep', function(cb) {
 	runSequence('devcopyhtml', 'imgtiny', 'devcopycss', 'devcopyjsfile', 'devcopyjsassignhtmlfile', 'devcopy3rdjsfile', 'scsstocss', cb);
 });
 // prodstep
-gulp.task('prodstep', function(callback) {
+gulp.task('prod', function(callback) {
 	runSequence('cleanstep', ['devstep', 'createbuildjs'], 'rjs', ['prodImgcopy', 'prodcssmd5', 'prodjs'], 'webserver', function() {
 		console.log('------****** Finish prod. ******------');
 	});
