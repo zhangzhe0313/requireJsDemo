@@ -3,9 +3,9 @@ build/
 .npmrc
 dist/
 .project
-localconfig.json
+#localconfig.json
 src/static/pc/js/pages/pubinfo/pubinfo.js
 src/static/pc/.DS_Store
 .DS_Store
-rjs/
+#rjs/
 src/static/pc/js/global/commonconfig.js
